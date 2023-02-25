@@ -11,3 +11,7 @@ Today we created a new script for workshop two and completed chapter 13 of the c
 ## Workshop 3 17/02/23
 ### Testing
 Today we created a new script exploring testing, t tests: paired and unpaired from chapter 14 of the coursebook. Sometimes adding in the paramter of 'paired' can add to the information to answer the hypothesis, and sometimes it doesn't, so it can be removed. We also looked at what type I and II errors are and how repeatability can help to improve confidence in the results of the test. A test statistic on its own can be misleading, so it is better to report estimates and confidence intervals which include uncertainty. 
+
+## Workshop 4 24/02/23
+### Regression
+Today in another script, we explored regression; a linear model looking at the relationship of two continuous variables; wood density and hardness. We used Pearsons R to determine the association between the two variables, but used regression to determine if density causes hardness in wood. We looked at the equation y=a+bx+e and how to use this to predict unknown 'y' values. We also saw how to mean-center the data so that the regression line is not showing infinite values and how to use a standardised effect size. We finished up looking at the assumptions of the regression model and how this affects the confidence we have in the results.
