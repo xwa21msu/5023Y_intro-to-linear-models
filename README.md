@@ -15,3 +15,7 @@ Today we created a new script exploring testing, t tests: paired and unpaired fr
 ## Workshop 4 24/02/23
 ### Regression
 Today in another script, we explored regression; a linear model looking at the relationship of two continuous variables; wood density and hardness. We used Pearsons R to determine the association between the two variables, but used regression to determine if density causes hardness in wood. We looked at the equation y=a+bx+e and how to use this to predict unknown 'y' values. We also saw how to mean-center the data so that the regression line is not showing infinite values and how to use a standardised effect size. We finished up looking at the assumptions of the regression model and how this affects the confidence we have in the results.
+
+## Workshop 5 03/03/23
+### ANOVA
+Today in a new script, we explored ANOVA: what it is, one and two tailed ANOVA and how to infer information from the output table it produced. There were numerous activities to complete in an R Markdown document where all the code was placed in chunks and the final plot and results were knit into the markdown file. There, we looked at assumptions of the model also to check if the model was a good fit - generally the data fit well apart from the extreme residuals that were not normally distributed.
