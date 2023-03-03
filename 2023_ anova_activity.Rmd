@@ -1,0 +1,104 @@
+---
+title: "3/03/23 ANOVA Activity"
+author: "Lucy Marsden"
+date: "2023-03-03"
+output: html_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(eval = TRUE, echo = FALSE, message = FALSE, include=FALSE)
+```
+
+```{r data import and tidy}
+# PACKAGES
+library(tidyverse)
+library(broom)
+
+# IMPORT DATA
+frogs <- read_csv ("data/frogs_messy_data.csv")
+
+# CLEAN DATA
+colnames(frogs)
+
+frogs <- janitor::clean_names(frogs)
+
+glimpse(frogs)
+
+# rename columns
+
+frogs <- frogs %>% 
+  rename("13" = temperature13,
+         "18" = temperature18,
+         "25" = temperature25)
+
+# re-organise the data
+frogs <- frogs %>%
+  pivot_longer(`13`:`25`, names_to="temperature", values_to="days") %>% 
+  drop_na(days)
+
+# check for duplicated data
+
+frogs %>% 
+  duplicated() %>% 
+  sum() # sum of 0 = good
+
+## check for typos by implausibly large values
+
+frogs %>% 
+  summarise(min=min(13, na.rm=TRUE),
+            max=max(13, na.rm=TRUE))
+frogs %>% 
+  summarise(min=min(18, na.rm=TRUE),
+            max=max(18, na.rm=TRUE))
+frogs %>% 
+  summarise(min=min(25, na.rm=TRUE), 
+            max=max(25, na.rm=TRUE))
+
+# no stupidly large values found
+
+```
+
+```{r linear model, include = FALSE}
+
+lsmodelfrog <- lm(formula = days ~ temperature, data = frogs)
+
+summary(lsmodelfrog)
+anova(lsmodelfrog)
+
+# the mean is 26.3 +/- 0.26 days for temperature 13
+# temperature 18 was 5.3 +/- 0.36 days faster than temperature 13
+# temperature 25 was 10.1 +/- 0.36 days faster than temperature 13
+
+confint(lsmodelfrog)
+# the confidence intervals do not cross zero so the alternative hypothesis must be true.
+
+# ASSUMPTION CHECKING
+
+plot(lsmodelfrog)
+
+plot(lsmodelfrog, which=c(4,5))
+
+```
+
+## Figure for the Data
+```{r making a figure, include = TRUE}
+
+frogs %>% 
+  ggplot(aes(x=temperature, y=days))+
+  geom_boxplot() +
+  geom_point()+
+  geom_jitter(aes(colour = temperature),
+              alpha = 0.7,
+              show.legend = FALSE)+
+  labs(x = "Days to Hatch",
+       y = "Temperature (Degrees Celcius)") +
+  theme_light()
+
+# product of descriptive statistics
+# can use emmeans() package to produce estimate means and confidence intervals from the lm() -> product of inferential statistics
+
+```
+
+## Results Section
+
+Frog spawn incubated at 13°C on average hatched in 26 [25.7-26.8 (mean[95% CIs]) days. This was reduced at 18°C by 5.3 days [4.75-6.02 95% CI] and at 25°C by 10.1 days [9.37-10.83]. This showed that increasing temperature had a significant effect on reducing the time taken for frogspawn to hatch (one-way ANOVA, *F*~2,57~ = 385.9, *P* \< 0.001).
