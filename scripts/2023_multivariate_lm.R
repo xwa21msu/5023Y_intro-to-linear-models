@@ -134,4 +134,59 @@ coef(ls_1)[4]
 coef(ls_2)[2] + coef(ls_2)[3] + coef(ls_2)[4]
 # adding the f,l and f:l together makes them add up to the same effect of fl.
 
+#________________----
+
+# ANOVA TABLE ----
+# use drop to report an F stat with and without the interaction effect
+
+# report the interaction ----
+
+drop1(ls_2, test = "F")
+# testing the null that there is no true interaction effect
+
+# always report the estimate (effect) and the CIs (uncertainty)
+
+# report main effects without interaction ----
+# drop1 stops when there is a sig interaction (i.e., the individual variables are insignificant on their own)
+
+# we have to remove the interaction term before we can keep using drop1()
+
+ls_3 <- lm(biomass_m2 ~ fert + light, data = biomass)
+
+drop1(ls_3, test = "F")
+# reports of estimates should come from the full model
+# F stats can be reported from the reduced table.
+
+# BALANCED/UNBALANCED DESIGNS ----
+# numbers in levels make a difference using anovas
+
+# make three vectors and combine them into a new tibble
+
+height <- c(50,57,91,94,102,110,57,71,85,105,120)
+size <- c(rep("small", 2), rep("large", 4), rep("small", 3), rep("large", 2))
+treatment <- c(rep("Control", 6), rep("Removal", 5))
+
+unbalanced <- tibble(height, size, treatment)
+
+unbalanced
+
+lm_4 <- lm(height ~ size + treatment)
+anova(lm_4)
+
+lm_5 <- lm(height ~ treatment + size)
+anova(lm_5)
+# different outcome due to order of terms in the model!
+
+drop1(lm_4, test = "F")
+drop1(lm_5, test = "F")
+# using drop makes the outcome the same regardless of order of terms.
+
+#________________----
+
+# POST-HOC ----
+emmeans::emmeans(ls_2, specs = pairwise ~ light + fert + light:fert) %>% 
+  confint()
+# including the argument pairwise in front of the ~ prompts the post-hoc pairwise comparisons.
+# $emmeans contains the estimate mean values for each possible combination (with confidence intervals)
+# $ contrasts contains tukey test post hoc comparisons between levels
 
