@@ -190,3 +190,82 @@ emmeans::emmeans(ls_2, specs = pairwise ~ light + fert + light:fert) %>%
 # $emmeans contains the estimate mean values for each possible combination (with confidence intervals)
 # $ contrasts contains tukey test post hoc comparisons between levels
 
+#________________----
+
+# CONTINUOUS LINEAR MODEL ACTIVITY ----
+
+# DATA ----
+pollution <- read_csv(here::here("data", "pollution.csv"))
+
+head(pollution)
+
+pollution <- janitor::clean_names(pollution)
+
+colnames(pollution)
+
+glimpse(pollution)
+
+# check for duplicated data ----
+pollution %>% 
+  duplicated() %>% 
+  sum() # 0
+
+# check for missing values ----
+pollution %>% 
+  is.na() %>% 
+  sum() # 0
+
+# check for typos by looking at distinct characters/values ----
+pollution %>% 
+  distinct(stress)
+
+
+# check for typos - by looking at impossible values ----
+pollution %>% 
+  summarise(min=min(so2, na.rm=TRUE), 
+            max=max(so2, na.rm=TRUE))
+
+pollution %>% 
+  summarise(min=min(o3, na.rm=TRUE), 
+            max=max(o3, na.rm=TRUE))
+
+pollution %>% 
+  summarise(min=min(william, na.rm=TRUE), 
+            max=max(william, na.rm=TRUE))
+
+# quick summary ----
+summary(pollution)
+
+# VISUALISE DATA ----
+
+pollution %>% 
+  ggplot(aes(x = o3, y = william))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  facet_wrap(~ stress)+
+  labs(x = expression(paste(Ozone~mu~L~L^-1)),
+       y = expression(paste(Log~Yield~(kg~ha^-1))))
+
+# MODEL THE DATA ----
+
+lm_6 <- lm(william ~ o3 +
+             stress +
+             o3:stress,
+           data = pollution)
+summary(lm_6)
+
+# well watered stress level and o3 decrease avg. yield.
+
+lm_6 %>% 
+  broom::tidy(conf.int = T)
+
+# CHECK MODEL FIT ----
+
+performance::check_model(lm_6)
+
+drop1(lm_6, test = "F")
+# just accepts the null
+
+lm_7 <- lm(william ~ o3 + stress, data = pollution) 
+drop1(lm_7, test = "F")
+
