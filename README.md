@@ -19,3 +19,7 @@ Today in another script, we explored regression; a linear model looking at the r
 ## Workshop 5 03/03/23
 ### ANOVA
 Today in a new script, we explored ANOVA: what it is, one and two tailed ANOVA and how to infer information from the output table it produced. There were numerous activities to complete in an R Markdown document where all the code was placed in chunks and the final plot and results were knit into the markdown file. There, we looked at assumptions of the model also to check if the model was a good fit - generally the data fit well apart from the extreme residuals that were not normally distributed.
+
+## Workshop 6 10/03/23
+### Multivariate Linear Models
+In a new script, we looked at the effect of interactions between variables on a model which may change the mean effect more or less than that of the additive values of separate variables. We learned how to identify interactions on a graph by pinpointing non parallel lines and used drop1() to compare if the interaction term was having a large effect on explaining the variance in the data opposed to the individual variables. We finished up looking at how to report these and checking the fit of the model.
