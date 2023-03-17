@@ -147,3 +147,33 @@ car::vif(flyls1)
 #________________----
 
 # DATA TRANSFORMATIONS ----
+# when response variable is non-normal (violates model assumptions)
+
+# boxcox ----
+MASS::boxcox(flyls1)
+# maximum likelihood curve for the best transformation for fitting the data.
+# looks like it may work?:
+
+flyls_sqrt <- lm(sqrt(longevity) ~ type + thorax + sleep + type:sleep, data = fruitfly)
+
+performance::check_model(flyls_sqrt)
+# in actuality a sqrt doesn't help - may as well stick with original dataset
+
+#________________----
+
+# MODEL SELECTION ----
+# use drop1 function to remove top-level terms ----
+drop1(flyls1, test = "F")
+# F is not significantly different for interaction term -> can be dropped.
+
+# interaction dropped model 2 ----
+flyls2 <- lm(longevity ~ type + thorax + sleep, data = fruitfly)
+
+drop1(flyls2, test = "F")
+# AIC isnt improved by removing sleep (AIC is an estimator of model error and therefore quality)
+
+#________________----
+
+# POST-HOC ----
+emmeans::emmeans(flyls2, specs = pairwise ~ type + thorax + sleep)
+
