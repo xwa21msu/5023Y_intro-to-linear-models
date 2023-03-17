@@ -23,3 +23,7 @@ Today in a new script, we explored ANOVA: what it is, one and two tailed ANOVA a
 ## Workshop 6 10/03/23
 ### Multivariate Linear Models
 In a new script, we looked at the effect of interactions between variables on a model which may change the mean effect more or less than that of the additive values of separate variables. We learned how to identify interactions on a graph by pinpointing non parallel lines and used drop1() to compare if the interaction term was having a large effect on explaining the variance in the data opposed to the individual variables. We finished up looking at how to report these and checking the fit of the model.
+
+## Workshop 7 17/03/23
+### Complex Linear Models
+In a new script, we used fruitfly dataset to explore the hypothesis that increased sexual activity results in reduced lifespan in male fruitflies. The data was checked and a linear model was created, interaction terms were explored and the model simplified. Model fit was sure to be checked for goodness of fit and data transformation was explored also. The results were written up.
