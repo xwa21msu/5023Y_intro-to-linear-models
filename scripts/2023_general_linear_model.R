@@ -66,10 +66,81 @@ performance::check_model(cuckoo_ls1,
 # strong funneling effect - assumptions violated.
 # must try a poisson model using canonical log link function (due to being count data)
 
-# fitting poisson glm
+# fitting poisson glm ----
 cuckoo_glm1 <- glm(Beg ~ Mass + Species + Mass:Species, data=cuckoo, family=poisson(link="log"))
 summary(cuckoo_glm1)
 
 # appears there is a negative interaction effect for interaction term
 # shows begging calls do not increase with mass as much as you would expect for warblers compared to cuckoos.
+
+# plotting regression for each species ----
+# using augment allows you to generate fitted outcomes from the regression, make sure to set the predictions onto the response scale in order to 'back transform` the data onto the original scale
+broom::augment(cuckoo_glm1, type.predict = "response") %>% 
+  ggplot(aes(x=Mass, y=.fitted, colour=Species)) + 
+  geom_point() +
+  geom_line()+
+  scale_colour_manual(values=c("green3","turquoise3"))+
+  theme_minimal()
+
+broom::augment(cuckoo_glm1) %>% 
+  ggplot(aes(x=Mass, y=.fitted, colour=Species)) + 
+  geom_point() +
+  geom_line()+
+  scale_colour_manual(values=c("green3","turquoise3"))+
+  theme_minimal()
+# if we fit model on log scale, get fitted glm response (y on log) - straight lines
+# exponential curve when using the original data with type.predict = response (making it the same as the log transformed dataset)
+
+# checking fit of poisson model ----
+performance::check_model(cuckoo_glm1, 
+                         check = c("homogeneity",
+                                   "qq"))
+summary(cuckoo_glm1)
+
+#________________----
+
+# ESTIMATES AND INTERVALS ----
+# exponentiate the estimates to get them on the same scale as Y (all model estimates before this are logn(y))
+
+exp(coef(cuckoo_glm1)[1]) ### Intercept - Incidence rate at Mass=0, and Species = Cuckoo
+
+exp(coef(cuckoo_glm1)[2]) ### Change in the average incidence rate with Mass 
+
+exp(coef(cuckoo_glm1)[3]) ### Change in the incidence rate intercept when Species = Warbler and Mass = 0
+
+exp(coef(cuckoo_glm1)[4]) ### The extra change in incidence rate for each unit increase in Mass when Species = Warbler (the interaction effect)
+
+broom::tidy(cuckoo_glm1, 
+            exponentiate = T, 
+            conf.int = T)
+# tidying models with broom and specifying exponentiate = T puts model predictions on the response variable by removing log transformation
+
+#________________----
+
+# INTERPRETATION ----
+# important to remember if you're using the log-link scale or original scale 
+
+# For a fixed  mean-variance model we use a Chisquare distribution
+drop1(cuckoo_glm1, test = "Chisq")
+
+# emmeans can be another handy function - if you specify response then here it provideds the average call rate for each species, at the average value for any continuous measures - so here the average call rate for both species at an average body mass of 20.3
+emmeans::emmeans(cuckoo_glm1, specs = ~ Species:Mass, type = "response")
+
+#________________----
+
+# OVERDISPERSION ----
+
+# overdispersion = residual deviance/residual DFs
+# from summary using poisson only (above) is 436/47 = 9.3
+# overdispersed is >1 overdispersion statistic values.
+# -> issue due to larger than expected variance for that mean under poisson distribution
+# fixed with quasi-liklihood model (which accounts for the above)
+
+cuckoo_glm2 <- glm(Beg ~ Mass+Species+Mass:Species, data=cuckoo, family=quasipoisson(link="log"))
+summary(cuckoo_glm2)
+# no estimates have changed but the error and CIs have
+# accounts for greater than expected uncertainty seen with deviance
+# interaction effect appears no longer significant with wider standard error
+
+# now estimating with variance again (not deviance) so using t distribution and F tests with ANOVA and drop1()
 
