@@ -144,3 +144,42 @@ summary(cuckoo_glm2)
 
 # now estimating with variance again (not deviance) so using t distribution and F tests with ANOVA and drop1()
 
+#________________----
+
+# LOGISTIC REGRESSION (binomial data) ----
+
+#________________----
+
+# DATA ----
+
+challenger <- read_csv(here::here("data", "Challenger.csv"))
+
+head(challenger)
+
+#________________----
+
+# VISUALISATION ----
+# was noted that temperature might affect O-ring safety
+
+# only looking at flights where a failure occurred: ----
+challenger %>% 
+  filter(oring_dt > 0) %>% 
+  ggplot(aes(y=oring_dt, x=temp))+geom_point()+
+  ggtitle("Temperature on flight launches where an O-ring incident occurred")
+
+# concluded temp doesnt affect o-ring failures (due to occuring at different temps)
+
+# looking at the whole dataset ----
+challenger %>% 
+  ggplot(aes(y=oring_dt, 
+             x=temp))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ggtitle("All launch data")
+
+# clear relationship between temperature and o-ring failure
+
+#________________----
+
+# BINARY GLM ----
+
