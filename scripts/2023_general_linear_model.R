@@ -182,4 +182,94 @@ challenger %>%
 #________________----
 
 # BINARY GLM ----
+# to find the risk of failure vs no failure (0 vs 1)
+
+# dplyr to create a new column (no incident = 0, fail = 1 for anything >1) ----
+challenger <- challenger %>% 
+  mutate(oring_binary = ifelse(oring_dt =='0', 0, 1))
+
+# fitting the glm ----
+binary_model <- glm(oring_binary~temp, family=binomial, data=challenger)
+
+binary_model %>% 
+  broom::tidy(conf.int=T)
+
+# intercept = 23.77
+# i.e. when temp = 0, the mean log odds for an o-ring failure is 23.77 [CIs]
+# temp = 0.37
+# i.e. by every rise in temp, the log odds of a critical incident fall by 0.37
+
+#________________----
+
+# PROBABILITY ----
+# predict o-ring failure from the data
+
+broom::augment(binary_model, 
+               type.predict = "response") # tidyverse
+
+predict(binary_model, type = "response") # base r
+
+# converting to log odds with emmeans ----
+# to predict o-ring failure at the mean value of x temperature
+
+emmeans::emmeans(binary_model, specs=~temp, type="response")
+
+# probability of o-ring failure on an avg. day is 0.15:
+
+odds_at_69.6 <- exp(coef(binary_model)[1]+coef(binary_model)[2]*69.6)
+# To convert from odds to a probability, divide the odds by one plus the odds
+
+probability <-  odds_at_69.6/(1+odds_at_69.6)
+probability
+
+# changes in probability ----
+# B1/4 is the maximum difference in probability from a 1 degree change in temp
+# -0.37/4 = -0.09 - so maximum difference in probability of failure to a one degree change is 9%
+
+broom::augment(binary_model, 
+               type.predict="response", 
+               se_fit = T) %>% 
+  head()
+# augment doesnt produce 95% CIs, but Phil has made a handy-dandy piece of code that does it:
+
+augment_glm <- function(mod, predict = NULL){
+  fam <- family(mod)
+  ilink <- fam$linkinv
+  
+  broom::augment(mod, newdata = predict, se_fit=T)%>%
+    mutate(.lower = ilink(.fitted - 1.96*.se.fit),
+           .upper = ilink(.fitted + 1.96*.se.fit), 
+           .fitted=ilink(.fitted))
+}
+
+augment_glm(binary_model)
+
+# or you can do it all via emmeans:
+emmeans::emmeans(binary_model, 
+                 specs = ~ temp, 
+                 at=list(temp=c(66:27)), 
+                 type='response') 
+
+# plot showing changing probability of o-ring failure with temperature ----
+augment_glm(binary_model) %>% 
+  ggplot(aes(x=temp, y=oring_binary))+geom_line(aes(x=temp, y=.fitted))+
+  geom_ribbon(aes(ymin=.lower, ymax=.upper), alpha=0.2)
+
+#________________----
+
+# PREDICTIONS ----
+# the day of the launch, the temperature was 36F
+# can use model on the new data to make predictions.
+
+new_data <- tibble(temp=36, oring_binary=1)
+
+augment_glm(binary_model, new_data)
+# the chance of fail on the day was 0.999.
+
+#________________----
+
+# ASSUMPTIONS ----
+performance::check_model(binary_model)
+# binned residual plot is best estimate of overdispersion
+# here there is not enough data for robust checks
 
