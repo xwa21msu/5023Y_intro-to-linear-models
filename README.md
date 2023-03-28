@@ -27,3 +27,7 @@ In a new script, we looked at the effect of interactions between variables on a 
 ## Workshop 7 17/03/23
 ### Complex Linear Models
 In a new script, we used fruitfly dataset to explore the hypothesis that increased sexual activity results in reduced lifespan in male fruitflies. The data was checked and a linear model was created, interaction terms were explored and the model simplified. Model fit was sure to be checked for goodness of fit and data transformation was explored also. The results were written up.
+
+## Workshop 8 21/03/23
+### General Linear Models
+In this workshop we explored general linear models (GLM), in particular poisson regression for count data and logistic regression for binary data. For each GLM we used a separate dataset that would be approproate to apply those models to. We looked at interactions and overdispersion in terms of poisson regression to assess the fit of the model. For logistic regression, the change in coefficients to 'p' (probability) was explained as well as 'log odds' when working with binary data. Finally, predictions were made using the model creates (for logistic regression) and assumptions were broken down using 'performance' which adjusts its output appropriate to the model.
